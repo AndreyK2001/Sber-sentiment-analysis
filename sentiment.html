@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Classification</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  .container {
+    width: 50%;
+    margin: auto;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+  .results {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+  .results > div {
+    width: 30%;
+  }
+  .results .bar {
+    height: 20px;
+    border-radius: 5px;
+    background-color: #a0a0ff;
+  }
+</style>
+</head>
+<body>
+
+
+<div class="container">
+    <h2>Анализ тональности</h2>
+    <input type="text" id="textInput" placeholder="Введите текст...">
+    <button onclick="classifyText()">Получить сантимент</button>
+    <div id="results" class="results">
+    </div>
+  </div>
+  
+  <script>
+  function classifyText() {
+    var text = document.getElementById('textInput').value;
+    
+    // Отправка запроса на сервер
+    fetch('http://localhost:8080/predictions/sentiment_analysis', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 'data': text })
+    })
+    .then(response => response.json())
+    .then(data => displayResults(data))
+    .catch(error => console.error('Error:', error));
+  }
+  
+  function displayResults(data) {
+    var resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = ''; // очистка от предыдущего результата
+  
+    data.forEach(function(item) {
+      var barContainer = document.createElement('div');
+      var bar = document.createElement('div');
+      bar.classList.add('bar');
+      bar.style.width = (item.score * 100) + '%';
+      
+      barContainer.textContent = item.label;
+      barContainer.appendChild(bar);
+      
+      resultsContainer.appendChild(barContainer);
+    });
+  }
+  </script>
+  
+  </body>
+  </html>
